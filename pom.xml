@@ -7,10 +7,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.elasticsearch</groupId>
   <artifactId>elasticsearch-analysis-lemmagen</artifactId>
-  <version>8.9.2</version>
+  <version>8.19.23</version>
   <packaging>jar</packaging>
   <properties>
-    <elasticsearch.version>8.9.2</elasticsearch.version>
+    <elasticsearch.version>8.19.23</elasticsearch.version>
     <plugin.version>${elasticsearch.version}</plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

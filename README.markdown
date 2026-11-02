@@ -250,6 +250,17 @@ mvn package
 
 After that build should be located in `./target/releases`.
 
+A local build uses the versions in `pom.xml` and produces a `-SNAPSHOT` zip, e.g.
+`elasticsearch-analysis-lemmagen-8.19.23-1.0-SNAPSHOT-plugin.zip`. That marks it as a development
+build. Only CI builds from a release tag are releases. To reproduce a release build locally
+(here for tag `8.19.23-1.0`):
+
+```bash
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=8.19.23-1.0
+mvn package -Delasticsearch.version=8.19.23
+git checkout pom.xml
+```
+
 
 ## Release
 

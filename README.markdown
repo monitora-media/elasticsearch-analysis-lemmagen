@@ -250,14 +250,38 @@ mvn package
 
 After that build should be located in `./target/releases`.
 
+A local build uses the versions in `pom.xml` and produces a `-SNAPSHOT` zip, e.g.
+`elasticsearch-analysis-lemmagen-8.19.23-1.0-SNAPSHOT-plugin.zip`. That marks it as a development
+build. Only CI builds from a release tag are releases. To reproduce a release build locally
+(here for tag `8.19.23-1.0`):
+
+```bash
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=8.19.23-1.0
+mvn package -Delasticsearch.version=8.19.23
+git checkout pom.xml
+```
+
 
 ## Release
 
-To release for a new Elasticsearch version, add it to the versions in `.github/workflows/build.yml`.
-Then tag the commit and Github Actions should perform the rest.
+Release tags are `<es_version>-<major>.<minor>`. CI takes the Elasticsearch version from the
+tag, builds against it and publishes `elasticsearch-analysis-lemmagen-<es_version>-<major>.<minor>-plugin.zip`.
+Tags in any other format fail the build.
 
-    git tag v1
-    git push --tags
+- New Elasticsearch version, same plugin code: tag the same commit with the new ES version.
+  If the build fails because the Elasticsearch API changed, fix the code first.
+- Plugin change: bump the minor (or major) version.
+
+```
+git tag 8.19.23-1.0
+git push origin 8.19.23-1.0
+```
+
+Install URL:
+
+    https://github.com/monitora-media/elasticsearch-analysis-lemmagen/releases/download/<es_version>-<major>.<minor>/elasticsearch-analysis-lemmagen-<es_version>-<major>.<minor>-plugin.zip
+
+Releases up to `v1.0.2` use the old `v<version>` tags. They stay available.
 
 
 Credits

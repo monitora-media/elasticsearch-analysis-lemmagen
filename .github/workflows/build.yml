@@ -6,22 +6,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        es_version: [ 8.19.23 ]
     steps:
       - name: Checkout project sources
-        uses: actions/checkout@v2
-      - uses: actions/setup-java@v3
+        uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Set version
-        run: mvn --no-transfer-progress versions:set -DnewVersion=${{ matrix.es_version }}
+      # Release tags are <es_version>-<major>.<minor>, e.g. 8.19.23-1.0.
+      # Branch builds use the versions in pom.xml.
+      - name: Set version from tag
+        if: github.ref_type == 'tag'
+        run: |
+          if [[ "$GITHUB_REF_NAME" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+\.[0-9]+)$ ]]; then
+            mvn --no-transfer-progress versions:set -DgenerateBackupPoms=false -DnewVersion="$GITHUB_REF_NAME"
+            echo "MVN_ARGS=-Delasticsearch.version=${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
+          else
+            echo "::error::Tag '$GITHUB_REF_NAME' must be <es_version>-<major>.<minor>, e.g. 8.19.23-1.0"
+            exit 1
+          fi
 
       - name: Build
-        run: mvn --no-transfer-progress package -Delasticsearch.version=${{ matrix.es_version }}
+        run: mvn --no-transfer-progress package $MVN_ARGS
 
       - name: Release
         uses: softprops/action-gh-release@v1
